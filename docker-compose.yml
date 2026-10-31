@@ -1,0 +1,58 @@
+services:
+  postgresdb:
+    image: postgres:16-alpine
+    container_name: volunteer-postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: volunteeractivitydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - springboot-postgres-net
+
+
+     
+
+  backend:
+    
+     build:
+      context: ./backend
+      dockerfile: Dockerfile
+   
+     image: 2400032789klu/docker-backend-2400032789:latest
+     container_name: volunteer-activity-backend
+     ports:
+      - "2025:2000"
+     depends_on:
+      - postgresdb
+     restart: on-failure
+     networks:
+      - springboot-postgres-net
+
+      
+
+
+
+
+  frontend:
+     build:
+      context: ./frontend
+      dockerfile: Dockerfile
+     image: 2400032789klu/docker-frontend-2400032789:latest
+     container_name: docker-react
+     ports:
+      - "3000:80"
+     depends_on:
+      - backend
+     restart: on-failure
+     networks:
+      - springboot-postgres-net
+
+volumes:
+  postgres_data:
+
+networks:
+  springboot-postgres-net:
